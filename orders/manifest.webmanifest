@@ -1,0 +1,18 @@
+{
+ "name": "Tillo 3D",
+ "short_name": "Tillo 3D",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "lang": "ru",
+ "background_color": "#edf1ee",
+ "theme_color": "#eef2ef",
+ "icons": [
+  {
+   "src": "icon.svg",
+   "sizes": "any",
+   "type": "image/svg+xml",
+   "purpose": "any"
+  }
+ ]
+}
