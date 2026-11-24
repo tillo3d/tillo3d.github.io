@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tillo Toppers — каталог топперов</title>
+<meta name="description" content="Каталог топперов. Выберите фигурки, оформите заказ онлайн и следите за его статусом.">
+<meta name="theme-color" content="#FFF6EC">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@500;700&display=swap">
+<style>
+:root {
+  --bg: #FFF6EC; --card: #FFFFFF; --ink: #2B1D17; --muted: #7A675E; --line: #EADCCD;
+  --accent: #C8324F; --accent-ink: #FFFFFF; --accent-soft: #FBE3E7; --ok: #1F7A4D; --ok-soft: #DDF1E5; --warn: #9A5B00; --warn-soft: #FBEBCF;
+  --r: 18px; --shadow: 0 1px 2px rgba(43,29,23,.06), 0 6px 20px rgba(43,29,23,.06);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.45 'Golos Text', -apple-system, 'Segoe UI', Roboto, sans-serif; padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+h1, h2, h3, .num { font-family: 'Unbounded', 'Golos Text', sans-serif; letter-spacing: -.01em; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+
+header.top { padding: 18px 0 6px; }
+.brand { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand h1 { font-size: 20px; margin: 0; }
+.brand h1 span { color: var(--accent); }
+.tabs { display: inline-flex; background: #F3E6D8; border-radius: 99px; padding: 4px; }
+.tabs button { border: 0; background: transparent; padding: 8px 14px; border-radius: 99px; font-weight: 600; font-size: 14px; color: var(--muted); }
+.tabs button[aria-selected="true"] { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
+
+.hero { margin: 14px 0 6px; background: var(--ink); color: #FFF6EC; border-radius: 24px; padding: 20px; display: grid; gap: 12px; }
+.hero h2 { margin: 0; font-size: clamp(20px, 5.4vw, 30px); line-height: 1.15; }
+.hero h2 em { font-style: normal; color: #FFB3C0; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; }
+.facts span { background: rgba(255,246,236,.12); border-radius: 99px; padding: 6px 12px; font-size: 14px; }
+.facts b { font-weight: 700; }
+
+.tools { position: sticky; top: 0; z-index: 5; background: linear-gradient(var(--bg) 80%, transparent); padding: 12px 0 10px; display: grid; gap: 10px; }
+.search { width: 100%; border: 1px solid var(--line); background: var(--card); border-radius: 14px; padding: 12px 14px; outline: none; }
+.search:focus, .f input:focus, .f textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.cats { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
+.cats::-webkit-scrollbar { display: none; }
+.cats button { flex: none; border: 1px solid var(--line); background: var(--card); border-radius: 99px; padding: 8px 14px; font-size: 14px; font-weight: 500; }
+.cats button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 12px; }
+.item { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; border: 2px solid transparent; transition: border-color .15s; }
+.item.on { border-color: var(--accent); }
+.pic { aspect-ratio: 1 / 1; display: grid; place-items: center; font-size: 64px; position: relative; }
+.pic img { width: 100%; height: 100%; object-fit: cover; }
+html, body, button, a, input, label { touch-action: manipulation; }   /* без зума по двойному тапу */
+.pic .cnt { position: absolute; top: 8px; right: 8px; background: var(--accent); color: #fff; border-radius: 99px; padding: 3px 10px; font-size: 13px; font-weight: 700; }
+.pic .demo { position: absolute; left: 8px; top: 8px; background: rgba(255,255,255,.8); border-radius: 99px; padding: 2px 8px; font-size: 11px; color: var(--muted); }
+.meta { padding: 10px 12px 12px; display: grid; gap: 8px; }
+.meta .nm { font-weight: 600; line-height: 1.25; min-height: 2.5em; }
+.meta .pr { color: var(--muted); font-size: 14px; }
+.qty { display: grid; grid-template-columns: 40px 1fr 40px; gap: 6px; align-items: center; }
+.qty button { height: 40px; border-radius: 12px; border: 1px solid var(--line); background: #FBF3E9; font-size: 20px; font-weight: 600; line-height: 1; }
+.qty button:active { transform: scale(.95); }
+.qty input { width: 100%; height: 40px; text-align: center; border: 1px solid var(--line); border-radius: 12px; background: #fff; font-weight: 700; outline: none; -moz-appearance: textfield; }
+.qty input::-webkit-outer-spin-button, .qty input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.hint { color: var(--muted); font-size: 13px; margin: 2px 0 12px; }
+.empty { text-align: center; color: var(--muted); padding: 40px 0; }
+
+.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); pointer-events: none; }
+.bar .in { pointer-events: auto; max-width: 720px; margin: 0 auto; background: var(--card); border-radius: 22px; box-shadow: 0 8px 30px rgba(43,29,23,.22); padding: 12px 12px 12px 16px; display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: center; }
+.bar .sum { font-weight: 700; font-size: 17px; }
+.bar .left { font-size: 13px; color: var(--muted); }
+.bar .left.ok { color: var(--ok); font-weight: 600; }
+.prog { grid-column: 1 / -1; height: 6px; background: #F1E4D6; border-radius: 99px; overflow: hidden; }
+.prog i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .25s; }
+.prog i.ok { background: var(--ok); }
+.btn { border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 14px; padding: 13px 18px; font-weight: 700; }
+.btn:disabled { background: #E3D5C6; color: #9B8A7E; cursor: not-allowed; }
+.btn.ghost { background: #F3E6D8; color: var(--ink); }
+.btn.wide { width: 100%; }
+a.btn { display: block; text-align: center; text-decoration: none; }
+.btn.wa { background: #25D366; color: #06361A; }
+.hero .btn.wa { justify-self: start; }
+.btn:not(:disabled):active { transform: scale(.98); }
+
+.sheet-bg { position: fixed; inset: 0; z-index: 20; background: rgba(43,29,23,.45); display: grid; align-items: end; justify-items: center; }
+.sheet { background: var(--bg); width: 100%; max-width: 560px; max-height: 94vh; max-height: 94dvh; overflow: auto; border-radius: 24px 24px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px)); }
+@media (min-width: 640px) { .sheet-bg { align-items: center; } .sheet { border-radius: 24px; } }
+.sheet h2 { font-size: 20px; margin: 0 0 12px; display: flex; justify-content: space-between; align-items: center; }
+.x { border: 0; background: #F3E6D8; width: 36px; height: 36px; border-radius: 50%; font-size: 18px; }
+.lines { background: var(--card); border-radius: var(--r); padding: 4px 12px; margin-bottom: 14px; }
+.line { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.line:last-child { border-bottom: 0; }
+.line .q { color: var(--muted); white-space: nowrap; }
+.line button { border: 0; background: transparent; color: var(--muted); font-size: 18px; padding: 2px 6px; }
+.total { display: flex; justify-content: space-between; font-weight: 700; padding: 10px 0 2px; }
+.f { display: grid; gap: 5px; margin-bottom: 12px; }
+.f label, .f .lb { font-size: 14px; font-weight: 600; }
+.f input, .f textarea { border: 1px solid var(--line); background: var(--card); border-radius: 12px; padding: 12px; outline: none; width: 100%; }
+.f small { color: var(--muted); }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.seg label { border: 1px solid var(--line); background: var(--card); border-radius: 12px; padding: 11px 12px; font-weight: 500; display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.seg input { accent-color: var(--accent); width: 18px; height: 18px; margin: 0; padding: 0; }
+.seg label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.err { background: var(--accent-soft); color: #8E1730; border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; font-size: 15px; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+.done { text-align: center; padding: 8px 0; }
+.done .big { font-size: 34px; margin: 6px 0; color: var(--accent); }
+.done p { margin: 6px 0; }
+.note { background: var(--warn-soft); color: var(--warn); border-radius: 12px; padding: 10px 12px; font-size: 14px; margin: 12px 0; text-align: left; }
+.stack { display: grid; gap: 8px; margin-top: 14px; }
+
+.status { max-width: 560px; margin: 14px auto 0; }
+.panel { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 16px; margin-bottom: 14px; }
+.panel h3 { margin: 0 0 10px; font-size: 16px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mine { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.mine button { border: 1px solid var(--line); background: #FBF3E9; border-radius: 99px; padding: 6px 12px; font-size: 14px; font-weight: 600; }
+.st-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.st-head .num { font-size: 22px; }
+.badge { border-radius: 99px; padding: 5px 12px; font-size: 14px; font-weight: 700; background: var(--warn-soft); color: var(--warn); }
+.badge.ok { background: var(--ok-soft); color: var(--ok); }
+.badge.off { background: #EEE; color: #666; }
+.steps { list-style: none; margin: 16px 0 6px; padding: 0; }
+.steps li { position: relative; padding: 0 0 16px 30px; color: var(--muted); }
+.steps li::before { content: ''; position: absolute; left: 4px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #E9DACA; }
+.steps li::after { content: ''; position: absolute; left: 10px; top: 20px; bottom: 0; width: 2px; background: #E9DACA; }
+.steps li:last-child { padding-bottom: 0; } .steps li:last-child::after { display: none; }
+.steps li.past { color: var(--ink); } .steps li.past::before, .steps li.past::after { background: var(--ok); }
+.steps li.now { color: var(--ink); font-weight: 700; } .steps li.now::before { background: var(--accent); box-shadow: 0 0 0 5px var(--accent-soft); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 15px; margin-top: 12px; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; text-align: right; font-weight: 600; }
+.pbar { height: 10px; background: #F1E4D6; border-radius: 99px; overflow: hidden; margin: 6px 0 4px; }
+.pbar i { display: block; height: 100%; background: var(--ok); border-radius: 99px; }
+footer { color: var(--muted); font-size: 13px; text-align: center; padding: 26px 0 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1158799490422909');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1158799490422909&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Tillo <span>Toppers</span></h1>
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tabCat" aria-selected="true">Каталог</button>
+        <button role="tab" id="tabSt" aria-selected="false">Статус заказа</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="vCat">
+    <section class="hero">
+      <h2>Выберите фигурки — <em>остальное сделаем мы</em></h2>
+      <div class="facts">
+        <span>Любой топпер — <b id="fPrice"></b></span>
+        <span>Заказ от <b id="fMin"></b></span>
+        <span>Сборка от <b id="fDays"></b></span>
+        <span>Оплата при получении или Kaspi</span>
+        <span>Бесплатная доставка от <b>50 000 ₸</b></span>
+      </div>
+      <a class="btn wa" href="https://wa.me/message/KSFGOIE7XI3PL1" target="_blank" rel="noopener">Напишите нам на WhatsApp</a>
+    </section>
+    <div class="tools">
+      <input class="search" id="q" type="search" placeholder="Найти топпер…" autocomplete="off">
+      <div class="cats" id="cats"></div>
+    </div>
+    <p class="hint">Кнопки «+» и «−» меняют количество по 10 штук. Можно вписать своё число.</p>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="none" hidden>Ничего не нашлось. Попробуйте другое слово.</div>
+  </main>
+
+  <main id="vSt" hidden>
+    <div class="status">
+      <div class="panel">
+        <h3>Где мой заказ?</h3>
+        <div class="mine" id="mine"></div>
+        <form id="stForm">
+          <div class="two">
+            <div class="f"><label for="sNum">Номер заказа</label><input id="sNum" placeholder="Т-1111-01" autocomplete="off" required></div>
+            <div class="f"><label for="sTel">Последние 4 цифры телефона</label><input id="sTel" inputmode="numeric" maxlength="4" placeholder="4567" required></div>
+          </div>
+          <div class="err" id="sErr" hidden></div>
+          <button class="btn wide" id="sBtn">Показать статус</button>
+        </form>
+      </div>
+      <div class="panel" id="stRes" hidden></div>
+      <a class="btn wa wide" href="https://wa.me/message/KSFGOIE7XI3PL1" target="_blank" rel="noopener">Напишите нам на WhatsApp</a>
+    </div>
+  </main>
+
+  <footer id="foot"></footer>
+</div>
+
+<div class="bar" id="bar">
+  <div class="in">
+    <div>
+      <div class="sum" id="bSum">Корзина пуста</div>
+      <div class="left" id="bLeft"></div>
+    </div>
+    <button class="btn" id="bGo" disabled>Оформить</button>
+    <div class="prog"><i id="bProg"></i></div>
+  </div>
+</div>
+
+<div class="sheet-bg" id="coBg" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="coT">
+    <div id="coForm">
+      <h2><span id="coT">Ваш заказ</span><button class="x" id="coX" aria-label="Закрыть">✕</button></h2>
+      <div class="lines" id="coLines"></div>
+      <form id="form" novalidate>
+        <div class="f"><label for="cName">Как к вам обращаться</label><input id="cName" autocomplete="name" maxlength="40" placeholder="Имя"></div>
+        <div class="f"><label for="cTel">Номер WhatsApp</label><input id="cTel" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="+7 701 123 45 67"></div>
+        <div class="f"><label for="cDate">К какой дате нужен заказ</label><input id="cDate" type="date"><small id="cDateHint"></small></div>
+        <div class="f"><span class="lb">Как получите</span>
+          <div class="seg"><label><input type="radio" name="get" value="pickup" checked> Самовывоз</label><label><input type="radio" name="get" value="delivery"> Доставка</label></div></div>
+        <div id="fAddr" hidden>
+          <div class="note" id="dNote"></div>
+          <div class="f"><label for="cAddr">Адрес доставки</label><input id="cAddr" maxlength="120" autocomplete="street-address" placeholder="Город, улица, дом"></div>
+          <div class="f"><label for="cRcv">Номер того, кто примет заказ</label><input id="cRcv" type="tel" inputmode="tel" maxlength="20" placeholder="+7 701 123 45 67"><small>Если принимаете сами — впишите свой номер.</small></div>
+        </div>
+        <div class="f"><span class="lb">Оплата</span>
+          <div class="seg"><label><input type="radio" name="pay" value="cash" checked> При получении</label><label><input type="radio" name="pay" value="kaspi"> Kaspi</label></div>
+          <small id="payHint" hidden>После оплаты через Kaspi <b>обязательно пришлите чек</b> нам в <a href="https://wa.me/message/KSFGOIE7XI3PL1" target="_blank" rel="noopener">WhatsApp</a>.</small></div>
+        <div class="f"><label for="cCom">Комментарий <small>(необязательно)</small></label><textarea id="cCom" rows="2" maxlength="300" placeholder="Пожелания к заказу"></textarea></div>
+        <input class="hp" id="cSite" name="site" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="err" id="cErr" hidden></div>
+        <button class="btn wide" id="cSend">Отправить заказ</button>
+      </form>
+    </div>
+    <div class="done" id="coDone" hidden></div>
+  </div>
+</div>
+
+<script>
+/* ===== Настройки сайта ===== */
+const API = 'https://script.google.com/macros/s/AKfycbzZ0o3wrFxu0kd8qo-CfTKAUqZxCLjJoJZB-SFjKAEwdypnOmaK51VqtuYcUksJNSuP/exec';
+const PRICE = 60;          // ₸ за одну фигурку
+const MIN_SUM = 15000;     // минимальный заказ, ₸
+const FREE_DELIVERY = 50000; // от этой суммы доставка за наш счёт, ₸
+const MIN_DAYS = 3;        // минимум дней на сборку
+const KASPI = 'https://pay.kaspi.kz/pay/hekyt6tb';
+const WA_LINK = 'https://wa.me/message/KSFGOIE7XI3PL1';   // WhatsApp магазина
+document.addEventListener('click', function (ev) { var a = ev.target.closest && ev.target.closest('a[href*="wa.me"]'); if (a) { try { fbq('track', 'Contact'); } catch (e) {} } });
+const DEMO = false;         // каталог-пример: на карточках пометка «пример»
+
+/* ===== Каталог. img — ссылка на фото (если пусто, показывается значок) ===== */
+const CATALOG = [
+  { id: 'f01', name: 'Дамплинг', cat: 'Другое', e: '🍡', c: '#F1F1F1' },
+  { id: 'f02', name: 'Коровка', cat: 'Животные', e: '🐮', c: '#FDE8EF' },
+  { id: 'f10', name: 'Мопс', cat: 'Животные', e: '🐶', c: '#F6E3C5' },
+  { id: 'f11', name: 'Серый котёнок', cat: 'Животные', e: '🐱', c: '#E8E8EE' },
+  { id: 'f12', name: 'Утка с бантиком', cat: 'Животные', e: '🦆', c: '#FDE3EC' },
+  { id: 'f13', name: 'Уточка', cat: 'Животные', e: '🦆', c: '#FFF3B8' },
+  { id: 'f14', name: 'Сердце', cat: 'Праздники', e: '❤️', c: '#FBDADF' },
+  { id: 'f15', name: 'Лисёнок', cat: 'Новый год', e: '🦊', c: '#FFE3CC' },
+  { id: 'f16', name: 'Зайчик', cat: 'Новый год', e: '🐰', c: '#FDE3EC' },
+  { id: 'f17', name: 'Белый мишка', cat: 'Новый год', e: '🐻‍❄️', c: '#E8F0FA' },
+  { id: 'f18', name: 'Совушка', cat: 'Новый год', e: '🦉', c: '#F3DFC8' },
+  { id: 'f19', name: 'Подарок', cat: 'Новый год', e: '🎁', c: '#FFE3CC' },
+  { id: 'f20', name: 'Пингвин', cat: 'Новый год', e: '🐧', c: '#E7E0F5' },
+  { id: 'f21', name: 'Ёлочка', cat: 'Новый год', e: '🎄', c: '#D9EEDD' },
+  { id: 'f22', name: 'Оленёнок', cat: 'Новый год', e: '🦌', c: '#F6E3C5' },
+  { id: 'f23', name: 'Зимний солдат', cat: 'Супергерои', e: '🦸', c: '#FFFFFF' },
+  { id: 'f24', name: 'Капитан Америка', cat: 'Супергерои', e: '🦸', c: '#FFFFFF' },
+  { id: 'f25', name: 'Мистер Фантастик', cat: 'Супергерои', e: '🦸', c: '#FFFFFF' },
+  { id: 'f26', name: 'Невидимая леди', cat: 'Супергерои', e: '🦸', c: '#FFFFFF' },
+  { id: 'f27', name: 'Существо', cat: 'Супергерои', e: '🦸', c: '#FFFFFF' },
+  { id: 'f28', name: 'Сокол', cat: 'Супергерои', e: '🦸', c: '#FFFFFF' },
+  { id: 'f29', name: 'Тор', cat: 'Супергерои', e: '🦸', c: '#FFFFFF' },
+  { id: 'f30', name: 'Человек-факел', cat: 'Супергерои', e: '🦸', c: '#FFFFFF' },
+  { id: 'f31', name: 'Доктор Дум', cat: 'Супергерои', e: '🦸', c: '#FFFFFF' }
+];
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸';
+const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+const plural = (n, a, b, c) => { const m = n % 100, k = n % 10; return m > 10 && m < 20 ? c : k === 1 ? a : k > 1 && k < 5 ? b : c; };
+const byId = Object.fromEntries(CATALOG.map(x => [x.id, x]));
+const MIN_QTY = Math.ceil(MIN_SUM / PRICE);
+
+let cart = store.get('cart', {}), cat = 'Все', query = '';
+Object.keys(cart).forEach(k => { if (!byId[k] || !(cart[k] > 0)) delete cart[k]; });
+const totalQty = () => Object.values(cart).reduce((s, x) => s + x, 0);
+
+$('fPrice').textContent = money(PRICE); $('fMin').textContent = money(MIN_SUM) + ' (' + MIN_QTY + ' шт)';
+$('fDays').textContent = MIN_DAYS + ' ' + plural(MIN_DAYS, 'дня', 'дней', 'дней');
+$('foot').innerHTML = (DEMO ? 'Каталог пока показан с примерами — настоящие фото появятся скоро. ' : '') + '<br>Остались вопросы? <a href="' + WA_LINK + '" target="_blank" rel="noopener">Напишите нам на WhatsApp</a>';
+
+/* ----- Каталог ----- */
+function drawCats() {
+  const list = ['Все'].concat([...new Set(CATALOG.map(x => x.cat))]);
+  $('cats').innerHTML = list.map(c => `<button aria-pressed="${c === cat}" data-c="${esc(c)}">${esc(c)}</button>`).join('');
+  $('cats').querySelectorAll('button').forEach(b => b.onclick = () => { cat = b.dataset.c; drawCats(); drawGrid(); });
+}
+function drawGrid() {
+  const q = query.trim().toLowerCase();
+  const list = CATALOG.filter(x => (cat === 'Все' || x.cat === cat) && (!q || x.name.toLowerCase().includes(q) || x.cat.toLowerCase().includes(q)));
+  $('none').hidden = list.length > 0;
+  $('grid').innerHTML = list.map(x => {
+    const n = cart[x.id] || 0;
+    return `<article class="item${n ? ' on' : ''}" data-id="${x.id}">
+      <div class="pic" style="background:${x.c || '#F3E6D8'}">${x.img ? `<img src="${esc(x.img)}" alt="${esc(x.name)}" loading="lazy">` : `<span aria-hidden="true">${x.e || '🎀'}</span>`}
+        ${DEMO ? '<span class="demo">пример</span>' : ''}<span class="cnt"${n ? '' : ' hidden'}>${n} шт</span></div>
+      <div class="meta"><div><div class="nm">${esc(x.name)}</div><div class="pr">${money(PRICE)} / шт</div></div>
+        <div class="qty"><button type="button" data-d="-10" aria-label="Убрать 10 штук: ${esc(x.name)}">−</button>
+          <input type="number" inputmode="numeric" min="0" max="5000" value="${n || ''}" placeholder="0" aria-label="Количество: ${esc(x.name)}">
+          <button type="button" data-d="10" aria-label="Добавить 10 штук: ${esc(x.name)}">+</button></div></div></article>`;
+  }).join('');
+}
+function setQty(id, n, card) {
+  n = Math.max(0, Math.min(5000, Math.floor(Number(n) || 0)));
+  if (n) cart[id] = n; else delete cart[id];
+  store.set('cart', cart);
+  if (card) {
+    card.classList.toggle('on', n > 0);
+    const c = card.querySelector('.cnt'); c.hidden = !n; c.textContent = n + ' шт';
+    const inp = card.querySelector('input'); if (document.activeElement !== inp) inp.value = n || '';
+  }
+  drawBar();
+}
+$('grid').addEventListener('click', e => {
+  const b = e.target.closest('button[data-d]'); if (!b) return;
+  const card = b.closest('.item'), id = card.dataset.id;
+  setQty(id, (cart[id] || 0) + Number(b.dataset.d), card);
+});
+$('grid').addEventListener('input', e => { if (e.target.matches('.qty input')) { const card = e.target.closest('.item'); setQty(card.dataset.id, e.target.value, card); } });
+$('grid').addEventListener('focusout', e => { if (e.target.matches('.qty input')) { const card = e.target.closest('.item'); e.target.value = cart[card.dataset.id] || ''; } });
+$('q').addEventListener('input', e => { query = e.target.value; drawGrid(); });
+
+function drawBar() {
+  const n = totalQty(), sum = n * PRICE, ok = sum >= MIN_SUM;
+  $('bSum').textContent = n ? n + ' шт · ' + money(sum) : 'Корзина пуста';
+  $('bLeft').className = 'left' + (ok ? ' ok' : '');
+  $('bLeft').textContent = ok ? 'Минимальный заказ набран ✓' : n ? 'До заказа ещё ' + money(MIN_SUM - sum) + ' (' + (MIN_QTY - n) + ' шт)' : 'Минимальный заказ — ' + money(MIN_SUM);
+  $('bProg').style.width = Math.min(100, sum / MIN_SUM * 100) + '%'; $('bProg').className = ok ? 'ok' : '';
+  $('bGo').disabled = !ok;
+}
+
+/* ----- Вкладки ----- */
+function show(v) {
+  $('vCat').hidden = v !== 'cat'; $('vSt').hidden = v !== 'st'; $('bar').hidden = v !== 'cat';
+  $('tabCat').setAttribute('aria-selected', v === 'cat'); $('tabSt').setAttribute('aria-selected', v === 'st');
+  if (v === 'st') drawMine();
+  window.scrollTo(0, 0);
+}
+$('tabCat').onclick = () => show('cat'); $('tabSt').onclick = () => show('st');
+
+/* ----- Оформление ----- */
+const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const ru = s => { const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/); return m ? m[3] + '.' + m[2] + '.' + m[1] : s; };
+function minDate() { const d = new Date(); d.setDate(d.getDate() + MIN_DAYS); return iso(d); }
+function cartItems() { return Object.keys(cart).map(id => ({ id, n: byId[id].name, q: cart[id] })); }
+function drawLines() {
+  const it = cartItems(), n = totalQty();
+  $('coLines').innerHTML = it.map(x => `<div class="line"><span>${esc(x.n)}</span><span class="q">${x.q} шт</span><button type="button" data-rm="${x.id}" aria-label="Убрать: ${esc(x.n)}">✕</button></div>`).join('') +
+    `<div class="total"><span>Итого: ${n} шт</span><span>${money(n * PRICE)}</span></div>`;
+  $('cSend').disabled = n * PRICE < MIN_SUM;
+  if (n * PRICE < MIN_SUM) cErr('Минимальный заказ — ' + money(MIN_SUM) + '. Добавьте ещё ' + (MIN_QTY - n) + ' шт.'); else $('cErr').hidden = true;
+}
+$('coLines').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (!b) return; setQty(b.dataset.rm, 0); drawGrid(); drawLines(); });
+function cErr(t) { $('cErr').textContent = t; $('cErr').hidden = false; }
+$('bGo').onclick = () => {
+  const p = store.get('me', {});
+  if (!$('cName').value) $('cName').value = p.name || '';
+  if (!$('cTel').value) $('cTel').value = p.phone || '';
+  $('cDate').min = minDate(); if (!$('cDate').value || $('cDate').value < minDate()) $('cDate').value = minDate();
+  $('cDateHint').textContent = 'Самая ранняя дата — ' + ru(minDate()) + ': на сборку нужно минимум ' + MIN_DAYS + ' ' + plural(MIN_DAYS, 'день', 'дня', 'дней') + '. Если соберём раньше — вы увидите это в статусе заказа.';
+  $('coForm').hidden = false; $('coDone').hidden = true; $('cErr').hidden = true;
+  drawLines(); drawDelivery(); drawPay(); $('coBg').hidden = false; document.body.style.overflow = 'hidden';
+};
+function closeCo() { $('coBg').hidden = true; document.body.style.overflow = ''; }
+$('coX').onclick = closeCo;
+$('coBg').addEventListener('click', e => { if (e.target === $('coBg') && !sending) closeCo(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('coBg').hidden && !sending) closeCo(); });
+const cartSum = () => cartItems().reduce((t, x) => t + x.q, 0) * PRICE;
+function drawDelivery() {
+  $('fAddr').hidden = document.querySelector('input[name=get]:checked').value !== 'delivery';
+  const s = cartSum();
+  $('dNote').innerHTML = s >= FREE_DELIVERY
+    ? 'Доставка <b>за наш счёт</b> — заказ от ' + money(FREE_DELIVERY) + '.'
+    : '<b>Доставка за ваш счёт.</b> Бесплатно доставляем заказы от ' + money(FREE_DELIVERY) + ' (до бесплатной доставки не хватает ' + money(FREE_DELIVERY - s) + '). Стоимость доставки сообщим в WhatsApp.';
+}
+function drawPay() { $('payHint').hidden = document.querySelector('input[name=pay]:checked').value !== 'kaspi'; }
+document.querySelectorAll('input[name=get]').forEach(r => r.onchange = drawDelivery);
+document.querySelectorAll('input[name=pay]').forEach(r => r.onchange = drawPay);
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function call(body, tries) {
+  let last = { ok: false, error: 'network' };
+  for (let i = 0; i < tries; i++) {
+    if (i) await sleep(1500 * i * i);
+    const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 45000);
+    try {
+      const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body), signal: ctl.signal }).then(r => r.json());
+      clearTimeout(tm);
+      if (res && (res.ok || res.error !== 'busy')) return res;
+      last = res || last;
+    } catch (e) { clearTimeout(tm); last = { ok: false, error: 'network' }; }
+  }
+  return last;
+}
+const ERR = {
+  name: 'Впишите имя.', phone: 'Проверьте номер WhatsApp — в нём должно быть не меньше 10 цифр.', date: 'Выберите дату не раньше ' + ru(minDate()) + '.',
+  addr: 'Впишите адрес доставки.', rcv: 'Впишите номер того, кто примет заказ — не меньше 10 цифр.', items: 'В корзине что-то не так. Обновите страницу и соберите заказ заново.', min: 'Минимальный заказ — ' + money(MIN_SUM) + '.',
+  limit: 'Сейчас очень много заказов. Попробуйте через несколько минут.', busy: 'Сервер занят. Нажмите «Отправить заказ» ещё раз — второй заказ не создастся.',
+  network: 'Нет связи. Проверьте интернет и нажмите «Отправить заказ» ещё раз — второй заказ не создастся.'
+};
+let sending = false, lastSig = '', lastToken = '';
+const newToken = () => { const a = new Uint8Array(12); (window.crypto || window.msCrypto).getRandomValues(a); return Array.from(a, x => x.toString(36).padStart(2, '0')).join('').slice(0, 20); };
+$('form').addEventListener('submit', async e => {
+  e.preventDefault(); if (sending) return;
+  const name = $('cName').value.trim(), phone = $('cTel').value.trim(), date = $('cDate').value;
+  const get = document.querySelector('input[name=get]:checked').value, pay = document.querySelector('input[name=pay]:checked').value;
+  const rcv = $('cRcv').value.trim(), comment = $('cCom').value.trim();
+  let addr = $('cAddr').value.trim();
+  if (name.length < 2) { $('cName').focus(); return cErr(ERR.name); }
+  if (phone.replace(/\D/g, '').length < 10) { $('cTel').focus(); return cErr(ERR.phone); }
+  if (!date || date < minDate()) { $('cDate').focus(); return cErr(ERR.date); }
+  if (get === 'delivery' && addr.length < 5) { $('cAddr').focus(); return cErr(ERR.addr); }
+  if (get === 'delivery' && rcv.replace(/\D/g, '').length < 10) { $('cRcv').focus(); return cErr(ERR.rcv); }
+  if (get === 'delivery') { const tail = ' · принимает: ' + rcv; addr = addr.slice(0, 160 - tail.length) + tail; }
+  const items = cartItems().map(x => ({ n: x.n, q: x.q }));
+  const data = { name, phone, date, get, addr, pay, comment, items, site: $('cSite').value };
+  const sig = JSON.stringify(data);
+  if (sig !== lastSig) { lastSig = sig; lastToken = newToken(); }   // тот же заказ при повторе идёт с тем же ключом — дубля не будет
+  sending = true; $('cErr').hidden = true; $('cSend').disabled = true; $('cSend').textContent = 'Отправляем…';
+  const res = await call(Object.assign({ action: 'order', token: lastToken }, data), 4);
+  sending = false; $('cSend').disabled = false; $('cSend').textContent = 'Отправить заказ';
+  if (!res.ok) return cErr(ERR[res.error] || 'Не получилось отправить заказ. Попробуйте ещё раз.');
+  try { fbq('track', 'Lead', { value: res.sum, currency: 'KZT' }); } catch (e) {}
+  store.set('me', { name, phone });
+  const mine = store.get('orders', []); mine.unshift({ number: res.number, tel: phone.replace(/\D/g, '').slice(-4) }); store.set('orders', mine.slice(0, 5));
+  cart = {}; store.set('cart', cart); lastSig = ''; drawGrid(); drawBar();
+  $('coForm').hidden = true; $('coDone').hidden = false;
+  $('coDone').innerHTML = `<div style="font-size:44px">🎉</div><h2 style="justify-content:center">Заказ принят</h2>
+    <p>Номер вашего заказа</p><div class="num big">${esc(res.number)}</div>
+    <p>${res.qty} шт · <b>${money(res.sum)}</b> · к ${ru(date)}</p>
+    <div class="note">Сохраните номер: по нему и последним 4 цифрам телефона можно смотреть статус заказа. Мы напишем вам в WhatsApp для подтверждения.</div>
+    ${pay === 'kaspi' ? `<div class="note" style="background:var(--ok-soft);color:var(--ok)">К оплате <b>${money(res.sum)}</b>. В комментарии к платежу укажите номер заказа <b>${esc(res.number)}</b>.<br><b>После оплаты обязательно пришлите чек нам в WhatsApp</b> — кнопка ниже.</div>` : ''}
+    ${get === 'delivery' && res.sum < FREE_DELIVERY ? `<div class="note">Доставка за ваш счёт: стоимость сообщим в WhatsApp.</div>` : ''}
+    <div class="stack">
+      ${pay === 'kaspi' ? `<a class="btn wide" style="text-decoration:none;display:block" href="${KASPI}" target="_blank" rel="noopener">Оплатить в Kaspi</a>` : ''}
+      <a class="btn wa wide" href="${WA_LINK}" target="_blank" rel="noopener">${pay === 'kaspi' ? 'Отправить чек в WhatsApp' : 'Напишите нам на WhatsApp'}</a>
+      <button class="btn ghost wide" id="dSt">Смотреть статус заказа</button>
+      <button class="btn ghost wide" id="dClose">Вернуться в каталог</button>
+    </div>`;
+  $('dSt').onclick = () => { closeCo(); show('st'); pick(mine[0]); };
+  $('dClose').onclick = closeCo;
+});
+
+/* ----- Статус ----- */
+const STEPS = ['Заказ принят', 'В очереди на изготовление', 'Изготавливаем', 'Собираем заказ', 'Готов к выдаче', 'Выдан'];
+const STATE = { new: ['Принят, ждёт подтверждения', ''], wait: ['Ждём вашего ответа в WhatsApp', ''], queue: ['В очереди', ''], make: ['Изготавливаем', ''], pack: ['Собираем', ''], ready: ['Готов! Можно забирать', 'ok'], done: ['Выдан', 'ok'], cancel: ['Отменён', 'off'] };
+function drawMine() {
+  const mine = store.get('orders', []);
+  $('mine').innerHTML = mine.map((o, i) => `<button type="button" data-i="${i}">${esc(o.number)}</button>`).join('');
+  $('mine').querySelectorAll('button').forEach(b => b.onclick = () => pick(mine[+b.dataset.i]));
+  if (mine.length && !$('sNum').value) { $('sNum').value = mine[0].number; $('sTel').value = mine[0].tel; }
+}
+function pick(o) { if (!o) return; $('sNum').value = o.number; $('sTel').value = o.tel; $('stForm').requestSubmit(); }
+$('stForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const number = $('sNum').value.trim(), phone = $('sTel').value.replace(/\D/g, '');
+  const sErr = t => { $('sErr').textContent = t; $('sErr').hidden = false; };
+  $('sErr').hidden = true;
+  if (number.replace(/\D/g, '').length < 5) return sErr('Впишите номер заказа, например Т-1111-01. Достаточно одних цифр.');
+  if (phone.length !== 4) return sErr('Впишите последние 4 цифры телефона, который указали в заказе.');
+  $('sBtn').disabled = true; $('sBtn').textContent = 'Ищем…';
+  const r = await call({ action: 'ostatus', number, phone }, 2);
+  $('sBtn').disabled = false; $('sBtn').textContent = 'Показать статус';
+  if (!r.ok) { $('stRes').hidden = true; return sErr(r.error === 'not_found' || r.error === 'bad_request' ? 'Такой заказ не нашёлся. Проверьте номер и цифры телефона.' : 'Нет связи. Попробуйте ещё раз.'); }
+  const s = STATE[r.state] || STATE.new, off = r.state === 'cancel';
+  const pct = r.total ? Math.round(r.done / r.total * 100) : 0;
+  const due = Math.max(0, (r.sum || 0) - (r.prepaid || 0));
+  $('stRes').hidden = false;
+  $('stRes').innerHTML = `<div class="st-head"><span class="num">${esc(r.number)}</span><span class="badge ${s[1]}">${s[0]}</span></div>
+    ${off ? '' : `<ol class="steps">${STEPS.map((t, i) => `<li class="${i < r.step || r.state === 'done' ? 'past' : i === r.step ? 'now' : ''}">${t}</li>`).join('')}</ol>`}
+    ${!off && r.total ? `<div>Собрано ${r.done} из ${r.total} шт</div><div class="pbar"><i style="width:${pct}%"></i></div>` : ''}
+    <dl class="kv"><dt>Оформлен</dt><dd>${esc(r.created)}</dd>
+      <dt>${r.state === 'done' && r.fact ? 'Выдан' : 'Будет готов к'}</dt><dd>${esc(r.state === 'done' && r.fact ? r.fact : r.plan)}</dd>
+      <dt>Получение</dt><dd>${esc(r.get)}</dd><dt>Сумма</dt><dd>${money(r.sum)}</dd>
+      ${r.prepaid ? `<dt>Оплачено</dt><dd>${money(r.prepaid)}</dd>` : ''}</dl>
+    ${!off && r.state !== 'done' && due > 0 ? `<div class="stack"><a class="btn ghost wide" style="text-decoration:none;display:block;text-align:center" href="${KASPI}" target="_blank" rel="noopener">Оплатить в Kaspi · ${money(due)}</a></div>` : ''}`;
+});
+
+drawCats(); drawGrid(); drawBar();
+</script>
+<script>
+fetch('photos.txt').then(function (r) { return r.json(); }).then(function (m) { CATALOG.forEach(function (x) { if (m[x.id]) x.img = m[x.id]; }); drawGrid(); }).catch(function () {});
+</script>
+</body>
+</html>
