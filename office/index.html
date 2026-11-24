@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Выдача">
+<meta name="theme-color" content="#0d7a51">
+<link rel="manifest" href="manifest.webmanifest">
+
+<link rel="icon" href="icon.svg" type="image/svg+xml"><script>(function(){try{var c=document.createElement("canvas");c.width=c.height=180;var x=c.getContext("2d");x.fillStyle="#0D7A51";x.fillRect(0,0,180,180);function p(f,a){x.fillStyle=f;x.beginPath();x.moveTo(a[0]*1.8,a[1]*1.8);for(var i=2;i<a.length;i+=2)x.lineTo(a[i]*1.8,a[i+1]*1.8);x.closePath();x.fill();}p("#fff",[50,22,78,36,50,50,22,36]);p("#DCEFE5",[22,40,48,53,48,80,22,67]);p("#B7DCC9",[52,53,78,40,78,67,52,80]);var l=document.createElement("link");l.rel="apple-touch-icon";l.href=c.toDataURL("image/png");document.head.appendChild(l);}catch(e){}})();</script>
+<title>Tillo 3D — Выдача заказов</title>
+<style>
+:root{--bg:#edf1ee;--card:#fff;--line:#dbe3de;--fg:#101914;--muted:#5a6861;--accent:#0d7a51;--accent-soft:#dcefe5;--warn:#b4561a;--warn-soft:#fbeadb;--bad:#b3261e}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+button,input{font:inherit}
+.top{position:sticky;top:0;z-index:5;background:var(--accent);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;gap:10px}
+.top h1{font-size:18px;margin:0;flex:1}
+.top h1 small{display:block;font-size:12px;font-weight:400;opacity:.85}
+.icon{background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:10px;height:38px;min-width:38px;padding:0 12px;font-size:15px;cursor:pointer}
+.icon:active{background:rgba(255,255,255,.3)}
+.wrap{max-width:760px;margin:0 auto;padding:12px 12px 90px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#dfe7e2;border-radius:12px;padding:4px;margin-bottom:10px}
+.tabs button{border:0;background:transparent;border-radius:9px;padding:10px 6px;font-weight:600;color:var(--muted);cursor:pointer}
+.tabs button[aria-pressed=true]{background:#fff;color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.badge{display:inline-block;background:var(--accent);color:#fff;border-radius:99px;font-size:12px;padding:1px 8px;margin-left:6px}
+.search{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 14px;background:#fff;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.no{font-weight:700;font-size:20px}
+.cl{font-weight:600;font-size:18px}
+.since{margin-left:auto;font-size:12px;color:var(--muted)}
+.ph{display:inline-flex;align-items:center;gap:6px;margin:6px 0;color:var(--accent);font-weight:600;font-size:17px;text-decoration:none}
+.ds{white-space:pre-line;margin:4px 0;color:#26322b}
+.cp{margin:6px 0;padding:8px 10px;background:#f3f6f4;border-radius:10px;font-size:14px;color:#26322b}
+.nt{margin:6px 0;padding:8px 10px;background:#fff8e6;border-radius:10px;font-size:14px}
+.money{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}
+.money div{background:#f3f6f4;border-radius:10px;padding:8px 10px}
+.money span{display:block;font-size:12px;color:var(--muted)}
+.money b{font-size:16px}
+.money .due{background:var(--warn-soft)}
+.money .due b{color:var(--warn)}
+.money .okp{background:var(--accent-soft)}
+.money .okp b{color:var(--accent)}
+.who{font-size:13px;color:var(--muted);margin-top:2px}
+.go{width:100%;border:0;border-radius:12px;padding:14px;background:var(--accent);color:#fff;font-weight:700;font-size:17px;cursor:pointer;margin-top:8px}
+.go:disabled{opacity:.6}
+.confirm{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.confirm label{display:flex;gap:10px;align-items:center;font-size:16px;margin-bottom:10px}
+.confirm input[type=checkbox]{width:22px;height:22px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ghost{border:1px solid var(--line);background:#fff;border-radius:12px;padding:13px;font-weight:600;cursor:pointer}
+.done{border-color:#bfe0cf;background:#f7fcf9}
+.tag{display:inline-block;background:var(--accent-soft);color:var(--accent);border-radius:99px;padding:2px 10px;font-size:13px;font-weight:600}
+.empty{text-align:center;color:var(--muted);padding:40px 10px}
+.empty b{display:block;font-size:42px;margin-bottom:6px}
+.login{max-width:380px;margin:12vh auto 0;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px}
+.login h2{margin:0 0 6px}
+.login p{color:var(--muted);margin:0 0 14px}
+.login input{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:10px}
+.err{color:var(--bad);font-size:14px;margin:0 0 10px}
+.toast{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));max-width:736px;margin:0 auto;background:#14201a;color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;z-index:9;box-shadow:0 6px 24px rgba(0,0,0,.3)}
+.toast span{flex:1}
+.toast button{background:#fff;color:#14201a;border:0;border-radius:10px;padding:8px 14px;font-weight:700;cursor:pointer}
+.stat{font-size:12px;color:var(--muted);text-align:center;margin:6px 0 0}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div id="login" class="login" hidden>
+  <h2>Выдача заказов</h2>
+  <p>Введите ключ офиса. Он запоминается на этом устройстве.</p>
+  <div class="err" id="loginErr" hidden></div>
+  <input id="keyIn" type="password" autocomplete="off" placeholder="Ключ офиса">
+  <button class="go" id="keyGo" style="margin-top:0">Войти</button>
+</div>
+
+<div id="app" hidden>
+  <div class="top">
+    <h1>Выдача заказов<small id="sub">Загружаю…</small></h1>
+    <button class="icon" id="refresh" aria-label="Обновить">↻ Обновить</button>
+    <button class="icon" id="logout" aria-label="Выйти">Выйти</button>
+  </div>
+  <div class="wrap">
+    <div class="tabs">
+      <button id="tabQ" aria-pressed="true">К выдаче<span class="badge" id="nQ">0</span></button>
+      <button id="tabD" aria-pressed="false">Выданные</button>
+    </div>
+    <input class="search" id="q" type="search" placeholder="Поиск: номер, имя, телефон">
+    <div id="list"></div>
+    <div class="stat" id="stat"></div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden><span id="toastT"></span><button id="toastB">Отменить</button></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbzZ0o3wrFxu0kd8qo-CfTKAUqZxCLjJoJZB-SFjKAEwdypnOmaK51VqtuYcUksJNSuP/exec';
+const $ = id => document.getElementById(id);
+const store = { get(k) { try { return localStorage.getItem('tillo_office_' + k); } catch (e) { return null; } }, set(k, v) { try { if (v == null) localStorage.removeItem('tillo_office_' + k); else localStorage.setItem('tillo_office_' + k, v); } catch (e) {} } };
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = n => Math.round(Number(n) || 0).toLocaleString('ru-RU').replace(/,/g, ' ') + ' ₸';
+let data = { queue: [], done: [] }, tab = 'q', openId = null, undoT = null, busy = false, lastOk = 0;
+
+async function api(body) {
+  const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ key: store.get('key') }, body)) }).then(r => r.json());
+  return res;
+}
+function showLogin(msg) {
+  $('app').hidden = true; $('login').hidden = false; $('loginErr').hidden = !msg; $('loginErr').textContent = msg || ''; $('keyIn').focus();
+}
+async function load(manual) {
+  if (!store.get('key')) { showLogin(); return; }
+  if (busy) return; busy = true;
+  if (manual) $('sub').textContent = 'Обновляю…';
+  try {
+    const r = await api({ action: 'rows' });
+    if (!r.ok) {
+      if (r.error === 'bad_key') { store.set('key', null); showLogin('Неверный ключ'); return; }
+      $('sub').textContent = 'Ошибка сервера: ' + r.error; return;
+    }
+    if (r.role !== 'office') { store.set('key', null); showLogin('Этот ключ не для офиса'); return; }
+    data = { queue: r.queue || [], done: r.done || [] }; lastOk = Date.now();
+    $('login').hidden = true; $('app').hidden = false; render();
+  } catch (e) { $('sub').textContent = 'Нет связи. Данные могут быть неактуальны'; }
+  finally { busy = false; }
+}
+function matches(c, q) {
+  if (!q) return true; q = q.toLowerCase().trim();
+  const digits = q.replace(/\D/g, '');
+  return String(c.no).toLowerCase().indexOf(q.replace(/^№/, '')) === 0 || String(c.client).toLowerCase().indexOf(q) >= 0 || String(c.desc).toLowerCase().indexOf(q) >= 0 ||
+    (digits.length >= 3 && String(c.phone).replace(/\D/g, '').indexOf(digits) >= 0);
+}
+function card(c, isDone) {
+  const phone = c.phone ? `<a class="ph" href="tel:${esc(c.phone.replace(/[^\d+]/g, ''))}">📞 ${esc(c.phone)}</a>` : '';
+  const rest = c.rest > 0
+    ? `<div class="due"><span>К оплате</span><b>${money(c.rest)}</b></div>`
+    : `<div class="okp"><span>К оплате</span><b>0 ₸ ✓</b></div>`;
+  let btn = '';
+  if (!isDone) {
+    if (openId === c.id) {
+      btn = `<div class="confirm">${c.rest > 0 ? `<label><input type="checkbox" id="paid-${esc(c.id)}" checked> Клиент оплатил остаток ${money(c.rest)}</label>` : ''}
+        <div class="row"><button class="ghost" data-act="cancel">Назад</button><button class="go" style="margin:0" data-act="issue" data-id="${esc(c.id)}">Подтвердить выдачу</button></div></div>`;
+    } else btn = `<button class="go" data-act="open" data-id="${esc(c.id)}">Выдать заказ</button>`;
+  }
+  return `<div class="card ${isDone ? 'done' : ''}">
+    <div class="h"><span class="no">№${esc(c.no)}</span><span class="cl">${esc(c.client || 'Без имени')}</span>${isDone ? `<span class="since"><span class="tag">выдан ${esc(c.issuedAt)}</span></span>` : c.since ? `<span class="since">на выдаче с ${esc(c.since)}</span>` : ''}</div>
+    ${phone}
+    ${c.desc ? `<div class="ds">${esc(c.desc)}</div>` : ''}
+    ${c.compos ? `<div class="cp">Состав: ${esc(c.compos)}</div>` : ''}
+    ${c.note ? `<div class="nt">📝 ${esc(c.note)}</div>` : ''}
+    <div class="money"><div><span>Сумма</span><b>${money(c.price)}</b></div><div><span>Предоплата</span><b>${money(c.prepaid)}</b></div>${rest}</div>
+    ${c.executor ? `<div class="who">Исполнитель: ${esc(c.executor)}</div>` : ''}
+    ${isDone && c.issuedBy ? `<div class="who">Выдал: ${esc(c.issuedBy)}</div>` : ''}
+    ${btn}</div>`;
+}
+function render() {
+  const q = $('q').value, isQ = tab === 'q';
+  $('tabQ').setAttribute('aria-pressed', isQ); $('tabD').setAttribute('aria-pressed', !isQ);
+  $('nQ').textContent = data.queue.length; $('nQ').hidden = !data.queue.length;
+  $('sub').textContent = data.queue.length ? 'К выдаче: ' + data.queue.length : 'Заказов к выдаче нет';
+  const list = (isQ ? data.queue : data.done).filter(c => matches(c, q));
+  $('list').innerHTML = list.length ? list.map(c => card(c, !isQ)).join('') :
+    `<div class="empty"><b>${isQ ? '📦' : '🗂'}</b>${q ? 'Ничего не найдено' : isQ ? 'Сейчас нет заказов к выдаче' : 'Выданных заказов пока нет'}</div>`;
+  $('stat').textContent = lastOk ? 'Обновлено ' + new Date(lastOk).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '';
+}
+function toast(text, undoId) {
+  clearTimeout(undoT); $('toastT').textContent = text; $('toastB').hidden = !undoId; $('toast').hidden = false;
+  $('toastB').onclick = async () => { $('toast').hidden = true; try { const r = await api({ action: 'unissue', id: undoId }); if (!r.ok) alert('Не удалось отменить'); } catch (e) { alert('Нет связи'); } await load(true); };
+  undoT = setTimeout(() => $('toast').hidden = true, undoId ? 60000 : 4000);
+}
+$('list').addEventListener('click', async e => {
+  const b = e.target.closest('button[data-act]'); if (!b) return;
+  if (b.dataset.act === 'open') { openId = b.dataset.id; render(); return; }
+  if (b.dataset.act === 'cancel') { openId = null; render(); return; }
+  if (b.dataset.act === 'issue') {
+    const id = b.dataset.id, c = data.queue.find(x => x.id === id), chk = document.getElementById('paid-' + id);
+    b.disabled = true; b.textContent = 'Записываю…';
+    try {
+      const r = await api({ action: 'issue', id, paid: !!(chk && chk.checked), who: store.get('who') || 'Офис' });
+      if (r.ok) { openId = null; toast('Заказ №' + (c ? c.no : '') + ' выдан', id); }
+      else if (r.error === 'already') { openId = null; toast('Этот заказ уже выдан'); }
+      else toast('Не получилось: ' + r.error);
+    } catch (er) { toast('Нет связи. Заказ не отмечен, попробуйте ещё раз'); }
+    await load(true);
+  }
+});
+$('tabQ').onclick = () => { tab = 'q'; openId = null; render(); };
+$('tabD').onclick = () => { tab = 'd'; openId = null; render(); };
+$('q').addEventListener('input', render);
+$('refresh').onclick = () => load(true);
+$('logout').onclick = () => { if (confirm('Выйти из выдачи на этом устройстве?')) { store.set('key', null); location.reload(); } };
+$('keyGo').onclick = () => { const k = $('keyIn').value.trim(); if (!k) return; store.set('key', k); load(true); };
+$('keyIn').addEventListener('keydown', e => { if (e.key === 'Enter') $('keyGo').click(); });
+setInterval(() => { if (!document.hidden && !openId && store.get('key')) load(false); }, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && store.get('key')) load(false); });
+load(false);
+</script>
+</body>
+</html>
