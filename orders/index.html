@@ -1562,7 +1562,7 @@ function ingest3d(values) {
       client: g(r, 'Клиент'), desc: g(r, 'Описание'), status: g(r, 'Статус') || 'На согласовании',
       price: g(r, 'Цена заказа, ₸') === '' ? null : num(g(r, 'Цена заказа, ₸')), pre: num(g(r, 'Предоплата, ₸')),
       parts: g(r, 'Пластик, г (части через +)').replace(/^'/, '').split('+').map(x => num(x)).filter(x => x > 0),
-      plPrice: g(r, 'Цена пластика, ₸/г') === '' ? 4 : num(g(r, 'Цена пластика, ₸/г')),
+      plPrice: g(r, 'Цена пластика, ₸/г') === '' ? 5 : num(g(r, 'Цена пластика, ₸/г')),
       des: g(r, 'Дизайнер'), desPay: num(g(r, 'Оплата дизайнеру')), cur: g(r, 'Валюта') || '₽',
       rate: g(r, 'Курс ₽→₸') === '' ? 5.5 : num(g(r, 'Курс ₽→₸')), share: g(r, 'Доля Асета, %') === '' ? null : num(g(r, 'Доля Асета, %')),
       paid: g(r, 'Рассчитались'), note: g(r, 'Примечание'), src: g(r, 'Источник'), items: parseItems(g(r, 'Состав (готово/всего)')),
@@ -2375,7 +2375,7 @@ function openOrder(id) {
   $('oDesc').value = o ? o.desc : '';
   $('oPrice').value = o && o.price != null ? o.price : '';
   $('oPre').value = o && o.pre ? o.pre : ''; $('oFull').checked = !!(o && o.fullPaid);
-  $('oPlPrice').value = o ? o.plPrice : (last ? last.plPrice : 4);
+  $('oPlPrice').value = o ? o.plPrice : 4;
   $('oHandler').value = role !== 'owner' ? STAFF_NAME[role] : o ? o.staffName : '';
   handlerLabels($('oDate').value.slice(0, 7));
   $('oShare').value = role !== 'owner' ? defShare($('oDate').value.slice(0, 7), STAFF_NAME[role]) : o ? o.share : defShare($('oDate').value.slice(0, 7), $('oHandler').value);
