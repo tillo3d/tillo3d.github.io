@@ -657,6 +657,13 @@ body.role-staff #navPrint .owner-tab, body.role-timur #navPrint .owner-tab { dis
       <div class="hint">Печати с принтеров Тимура «на заказ», для которых я не смог сам найти заказ. Выберите заказ — граммы прибавятся к нему. Галочка «запомнить» — следующие печати с таким названием уйдут туда же сами.</div>
       <div class="ops" id="prList"></div>
     </div>
+    <div class="card pr-card" id="prRem" hidden>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3 id="prRemT" style="margin:0">Удалённые и пропущенные</h3><button class="btn sm ghost" type="button" id="prRemTog">Показать</button></div>
+      <div id="prRemBody" hidden>
+        <div class="hint">Печати, которые вы удалили или пропустили. Их можно вернуть в «Ждёт привязки» или сразу привязать к заказу — граммы прибавятся к нему.</div>
+        <div class="ops" id="prRemList"></div>
+      </div>
+    </div>
     <div class="card pr-card" id="prDone" hidden>
       <h3 id="prDoneT">Уже привязано</h3>
       <div class="hint">Все печати «на заказ», которые уже учтены: куда ушли граммы.</div>
@@ -2193,6 +2200,7 @@ function renderPrints() {
   });
   prBusy.forEach((v, id) => prMark(id));
   $('prDone').hidden = pFilter !== 'prints';
+  renderRemoved();
   const onPr = pFilter === 'prints';
   $('prInfo').hidden = !onPr; $('prBox').hidden = !onPr;
   $('prTitle').textContent = 'Ждёт привязки' + (un.length ? ' · ' + un.length : '');
@@ -2224,6 +2232,45 @@ function renderPrints() {
     };
   });
   prBusy.forEach((v, id) => prMark(id));
+}
+let prRPage = 0, prROpen = false;
+async function restorePrint(p) {
+  if (!p) throw { code: 'moved', message: 'Печать не нашлась — нажмите «Обновить».' };
+  if (src === 'api') return apiPost({ action: 'restoreprint', printId: p.id });
+  const chk = await mcp.callTool(SERVER, 'get_values', { spreadsheetId: SHEET_ID, range: `'Журнал печатей'!A${p.row}:K${p.row}` }, { cache: false });
+  const v = payloadValues(chk); if (!v || !v[0] || v[0][0] !== p.id || v[0][8]) throw { code: 'moved', message: 'Таблица изменилась. Нажмите «Обновить».' };
+  return mcp.callTool(SERVER, 'update_values', { spreadsheetId: SHEET_ID, range: `'Журнал печатей'!I${p.row}:K${p.row}`, values: [['', '', 'не разобрано']] });
+}
+function renderRemoved() {
+  const box = $('prRem'); if (!box) return;
+  box.hidden = pFilter !== 'prints'; if (box.hidden) return;
+  const list = prints.filter(p => !p.order && (p.how === 'удалено' || p.how === 'пропущено') && !prGone.has(p.id)).sort((a, b) => (prTs(b) - prTs(a)) || (b.row - a.row));
+  $('prRemT').textContent = 'Удалённые и пропущенные' + (list.length ? ' · ' + list.length : '');
+  $('prRemBody').hidden = !prROpen; $('prRemTog').textContent = prROpen ? 'Скрыть' : 'Показать';
+  $('prRemTog').onclick = () => { prROpen = !prROpen; renderRemoved(); };
+  const pg = $('prRemPager');
+  if (!prROpen) { if (pg) pg.hidden = true; return; }
+  if (!list.length) { $('prRemList').innerHTML = '<div class="empty" style="border:0">Удалённых и пропущенных печатей нет.</div>'; if (pg) pg.hidden = true; return; }
+  const act = p3().filter(o => o.open).sort((a, b) => (b.date || 0) - (a.date || 0));
+  const opts = act.map(o => `<option value="${esc(o.id)}">№${o.no} ${esc((o.client ? o.client + ' — ' : '') + (o.desc || '').split('\n')[0]).slice(0, 70)} (${mLabel(o.month).toLowerCase()})</option>`).join('');
+  const SZ = 10, pages = Math.max(1, Math.ceil(list.length / SZ)); if (prRPage >= pages) prRPage = pages - 1; if (prRPage < 0) prRPage = 0;
+  pager('prRemPager', 'prRemList', list.length, prRPage, SZ, q => { prRPage = q; renderRemoved(); });
+  $('prRemList').innerHTML = list.slice(prRPage * SZ, prRPage * SZ + SZ).map(p => `<div class="pr-row" data-pid="${esc(p.id)}">
+    <div class="pr-h"><b>${esc(p.name || 'без названия')}</b><span class="num">${money(p.grams)} г</span></div>
+    <div class="pr-m">${esc(p.printer)} · ${esc(p.start)} · <span class="flag">${p.how === 'удалено' ? 'удалена' : 'пропущена'}</span></div>
+    <div class="pr-a"><select aria-label="Заказ для печати"><option value="">Выберите заказ…</option>${opts}</select>
+      <button class="btn sm" type="button">Привязать</button>
+      <button class="btn sm ghost" type="button">Вернуть в неразобранные</button></div></div>`).join('');
+  $('prRemList').querySelectorAll('.pr-row').forEach(el => {
+    const p = prints.find(x => x.id === el.dataset.pid), sel = el.querySelector('select'), bs = el.querySelectorAll('button'), bind = bs[0], back = bs[1];
+    const run = async (btn, txt, fn) => {
+      el.querySelectorAll('button, select').forEach(x => x.disabled = true); btn.textContent = txt;
+      try { await fn(); try { await refreshNow(); } catch (e) {} renderPrints(); }
+      catch (e) { showWriteError(e); el.querySelectorAll('button, select').forEach(x => x.disabled = false); bind.textContent = 'Привязать'; back.textContent = 'Вернуть в неразобранные'; }
+    };
+    bind.onclick = () => { if (!sel.value) { sel.focus(); return; } run(bind, 'Привязываю…', () => assignPrint(p, sel.value, false)); };
+    back.onclick = () => run(back, 'Возвращаю…', () => restorePrint(p));
+  });
 }
 async function assignPrint(p, orderId, remember) {
   if (!p) throw { code: 'moved', message: 'Печать не нашлась — нажмите «Обновить».' };
