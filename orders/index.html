@@ -1542,7 +1542,7 @@ const BLOCK = [...ACTIVE, 'Готов'];   // пока такие заказы �
 const ME = /^асет/i, TIMUR = /^тимур/i, AMIR = /^амир/i, ALINA = /^алина/i, NURD = /^нурдаулет/i;
 // С декабря 2026 моя доля 40% (Тимуру 60%), до этого 35%. Амир/Алина берут 10% из моей доли.
 // Заказы Нурдаулета: ему 30%, мне 10%, Тимуру 60% — с самого начала.
-const baseShare = m => String(m || mk(new Date())) >= '2026-12' ? 40 : 35;
+const baseShare = m => { const s = String(m || isoDate(new Date())); return (s.length >= 10 ? s >= '2026-11-23' : s >= '2026-12') ? 40 : 35; };   // с 23.11.2026 моя доля 40%
 const siteOrdNow = () => !!editing && /^Сайт/i.test(editing.src || '');   // заказ с сайта топперов: Асету 30%, Нурдаулету 10%
 const defShare = (m, h) => NURD.test(h || '') ? (siteOrdNow() ? 30 : 10) : (AMIR.test(h || '') || ALINA.test(h || '')) ? baseShare(m) - 10 : baseShare(m);
 const defHelperPct = h => NURD.test(h || '') ? (siteOrdNow() ? 10 : 30) : 10;
@@ -2426,8 +2426,8 @@ function openOrder(id) {
   $('oPre').value = o && o.pre ? o.pre : ''; $('oFull').checked = !!(o && o.fullPaid);
   $('oPlPrice').value = o ? o.plPrice : 4;
   $('oHandler').value = role !== 'owner' ? STAFF_NAME[role] : o ? o.staffName : '';
-  handlerLabels($('oDate').value.slice(0, 7));
-  $('oShare').value = role !== 'owner' ? defShare($('oDate').value.slice(0, 7), STAFF_NAME[role]) : o ? o.share : defShare($('oDate').value.slice(0, 7), $('oHandler').value);
+  handlerLabels($('oDate').value);
+  $('oShare').value = role !== 'owner' ? defShare($('oDate').value, STAFF_NAME[role]) : o ? o.share : defShare($('oDate').value, $('oHandler').value);
   $('oDes').value = o ? o.des : '';
   $('oDesPay').value = o && o.desPay ? o.desPay : '';
   ordCur = o && o.desPay ? o.cur : '₽';
@@ -2463,13 +2463,13 @@ function formOrder() {
 function drawPass() {
   const box = $('oPassBox'); if (!box) return;
   box.hidden = role !== 'owner'; if (box.hidden) return;
-  const m = $('oDate').value.slice(0, 7), toN = !NURD.test($('oHandler').value);
+  const m = $('oDate').value, toN = !NURD.test($('oHandler').value);
   $('oPass').textContent = toN ? '→ Передать Нурдаулету' : '← Забрать себе';
   const a = toN ? defShare(m, 'Нурдаулет') : baseShare(m), h = toN ? defHelperPct('Нурдаулет') : 0;
   $('oPassHint').textContent = (toN ? 'После передачи: мне ' : 'После возврата: мне ') + a + '%' + (toN ? ', Нурдаулету ' + h + '%' : '') + ', Тимуру ' + (100 - a - h) + '%. Проценты пересчитаются сразу.' + (editing ? '' : ' Заказ ещё не сохранён.');
 }
 $('oPass').onclick = () => {
-  const toN = !NURD.test($('oHandler').value), m = $('oDate').value.slice(0, 7);
+  const toN = !NURD.test($('oHandler').value), m = $('oDate').value;
   $('oHandler').value = toN ? 'Нурдаулет' : ''; $('oShare').value = defShare(m, $('oHandler').value); drawOrderForm();
   if (editing) $('ordForm').requestSubmit();
 };
@@ -2497,8 +2497,8 @@ function handlerLabels(m) {
   const b = baseShare(m), op = $('oHandler').options;
   op[0].text = 'Без помощника: моя доля ' + b + '%'; op[1].text = 'Амир: мне ' + (b - 10) + '%, Амиру 10%'; op[2].text = 'Алина: мне ' + (b - 10) + '%, Алине 10%'; op[3].text = 'Нурдаулет: мне ' + defShare(m, 'Нурдаулет') + '%, ему ' + defHelperPct('Нурдаулет') + '%';
 }
-$('oHandler').addEventListener('change', () => { $('oShare').value = defShare($('oDate').value.slice(0, 7), $('oHandler').value); drawOrderForm(); });
-$('oDate').addEventListener('change', () => { handlerLabels($('oDate').value.slice(0, 7)); if (!editing && role === 'owner') { $('oShare').value = defShare($('oDate').value.slice(0, 7), $('oHandler').value); drawOrderForm(); } });
+$('oHandler').addEventListener('change', () => { $('oShare').value = defShare($('oDate').value, $('oHandler').value); drawOrderForm(); });
+$('oDate').addEventListener('change', () => { handlerLabels($('oDate').value); if (!editing && role === 'owner') { $('oShare').value = defShare($('oDate').value, $('oHandler').value); drawOrderForm(); } });
 $('oCur').querySelectorAll('button').forEach(b => b.onclick = () => { ordCur = b.dataset.c; drawOrderForm(); });
 /* состав заказа: виды, сколько нужно и сколько готово */
 function drawItems() {
