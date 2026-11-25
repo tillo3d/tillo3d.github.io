@@ -772,6 +772,7 @@ body.role-staff #navPrint .owner-tab, body.role-timur #navPrint .owner-tab { dis
       <div class="field own-only"><label for="oShare" id="oShareL">Моя доля в этом заказе, %</label><input id="oShare" inputmode="decimal"></div>
     </div>
     <div class="field own-only"><label for="oHandler">Кто обработал заказ</label><select id="oHandler"><option value="">Без помощника: моя доля 35%</option><option value="Амир">Амир: мне 25%, Амиру 10%</option><option value="Алина">Алина: мне 25%, Алине 10%</option><option value="Нурдаулет">Нурдаулет: мне 10%, ему 30%</option></select></div>
+    <div class="field own-only" id="oPassBox"><button type="button" class="btn ghost" id="oPass"></button><div class="hint" id="oPassHint" style="margin-top:6px"></div></div>
     <div class="grp">Дизайн</div>
     <div class="row2">
       <div class="field"><label for="oDes">Дизайнер</label><input id="oDes" list="oDesigners" placeholder="Нет / Рада / Асет"></div>
@@ -1542,8 +1543,9 @@ const ME = /^асет/i, TIMUR = /^тимур/i, AMIR = /^амир/i, ALINA = /^
 // С декабря 2026 моя доля 40% (Тимуру 60%), до этого 35%. Амир/Алина берут 10% из моей доли.
 // Заказы Нурдаулета: ему 30%, мне 10%, Тимуру 60% — с самого начала.
 const baseShare = m => String(m || mk(new Date())) >= '2026-12' ? 40 : 35;
-const defShare = (m, h) => NURD.test(h || '') ? 10 : (AMIR.test(h || '') || ALINA.test(h || '')) ? baseShare(m) - 10 : baseShare(m);
-const defHelperPct = h => NURD.test(h || '') ? 30 : 10;
+const siteOrdNow = () => !!editing && /^Сайт/i.test(editing.src || '');   // заказ с сайта топперов: Асету 30%, Нурдаулету 10%
+const defShare = (m, h) => NURD.test(h || '') ? (siteOrdNow() ? 30 : 10) : (AMIR.test(h || '') || ALINA.test(h || '')) ? baseShare(m) - 10 : baseShare(m);
+const defHelperPct = h => NURD.test(h || '') ? (siteOrdNow() ? 10 : 30) : 10;
 const DAT = { 'Амир': 'Амиру', 'Алина': 'Алине', 'Нурдаулет': 'Нурдаулету' };
 const staff3d = list => sum(list.filter(o => o.counts && o.isStaff), o => o.amir);   // зарплата тех, кто обработал заказы (Амир и Алина вместе)
 const amir3d = list => sum(list.filter(o => o.counts && o.isAmir), o => o.amir);
@@ -2458,7 +2460,21 @@ function formOrder() {
     handler: $('oHandler').value, amirPct: editing && editing.isStaff && editing.staffName === $('oHandler').value ? editing.amirPct : null };
   return calc3d(o);
 }
+function drawPass() {
+  const box = $('oPassBox'); if (!box) return;
+  box.hidden = role !== 'owner'; if (box.hidden) return;
+  const m = $('oDate').value.slice(0, 7), toN = !NURD.test($('oHandler').value);
+  $('oPass').textContent = toN ? '→ Передать Нурдаулету' : '← Забрать себе';
+  const a = toN ? defShare(m, 'Нурдаулет') : baseShare(m), h = toN ? defHelperPct('Нурдаулет') : 0;
+  $('oPassHint').textContent = (toN ? 'После передачи: мне ' : 'После возврата: мне ') + a + '%' + (toN ? ', Нурдаулету ' + h + '%' : '') + ', Тимуру ' + (100 - a - h) + '%. Проценты пересчитаются сразу.' + (editing ? '' : ' Заказ ещё не сохранён.');
+}
+$('oPass').onclick = () => {
+  const toN = !NURD.test($('oHandler').value), m = $('oDate').value.slice(0, 7);
+  $('oHandler').value = toN ? 'Нурдаулет' : ''; $('oShare').value = defShare(m, $('oHandler').value); drawOrderForm();
+  if (editing) $('ordForm').requestSubmit();
+};
 function drawOrderForm() {
+  drawPass();
   $('oStatus').innerHTML = STATUSES.map(([s]) => `<button type="button" data-s="${s}" aria-pressed="${s === oStatus}">${s}</button>`).join('');
   $('oStatus').querySelectorAll('button').forEach(b => b.onclick = () => { oStatus = b.dataset.s; if (oStatus === 'Передан клиенту' && !$('oFact').value) $('oFact').value = isoDate(new Date()); if (oStatus !== 'Передан клиенту') $('oFact').value = ''; drawOrderForm(); });
   $('oParts').innerHTML = oParts.length ? oParts.map((g, i) => `<span class="part">${money(g)} г<button type="button" data-i="${i}" aria-label="Убрать">×</button></span>`).join('') + `<span class="status">итого ${money(oParts.reduce((s, x) => s + x, 0))} г</span>` : '<span class="status">Пока ничего не напечатано</span>';
@@ -2479,7 +2495,7 @@ function drawOrderForm() {
 $('oFull').addEventListener('change', drawOrderForm);
 function handlerLabels(m) {
   const b = baseShare(m), op = $('oHandler').options;
-  op[0].text = 'Без помощника: моя доля ' + b + '%'; op[1].text = 'Амир: мне ' + (b - 10) + '%, Амиру 10%'; op[2].text = 'Алина: мне ' + (b - 10) + '%, Алине 10%';
+  op[0].text = 'Без помощника: моя доля ' + b + '%'; op[1].text = 'Амир: мне ' + (b - 10) + '%, Амиру 10%'; op[2].text = 'Алина: мне ' + (b - 10) + '%, Алине 10%'; op[3].text = 'Нурдаулет: мне ' + defShare(m, 'Нурдаулет') + '%, ему ' + defHelperPct('Нурдаулет') + '%';
 }
 $('oHandler').addEventListener('change', () => { $('oShare').value = defShare($('oDate').value.slice(0, 7), $('oHandler').value); drawOrderForm(); });
 $('oDate').addEventListener('change', () => { handlerLabels($('oDate').value.slice(0, 7)); if (!editing && role === 'owner') { $('oShare').value = defShare($('oDate').value.slice(0, 7), $('oHandler').value); drawOrderForm(); } });
